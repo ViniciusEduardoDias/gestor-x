@@ -18,11 +18,13 @@ export default function Header() {
         </Link>
 
         {/* Link para o painel */}
-        <Link href="/dashboard">
-          <div className="bg-white px-3 py-1 rounded-lg font-semibold text-black hover:bg-gray-200 transition">
-            MEU PAINEL
-          </div>
-        </Link>
+        {session?.user && (
+          <Link href="/dashboard">
+            <div className="bg-white px-3 py-1 rounded-lg font-semibold text-black hover:bg-gray-200 transition">
+              MEU PAINEL
+            </div>
+          </Link>
+        )}
 
         {/* Sessão de autenticação */}
         {status === "loading" ? (
