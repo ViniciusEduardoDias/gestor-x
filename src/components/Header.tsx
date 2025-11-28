@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { PiSignOut } from "react-icons/pi";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   return (
-    <header className="bg-black w-full px-8 pt-4 h-[150px]">
+    <header className="bg-black w-full px-8 pt-4 pb-4 mb-8 shadow-md">
       <div className="w-full flex justify-between md:max-w-[900px] mx-auto items-center">
         {/* Logo */}
         <Link href="/">
@@ -18,7 +20,7 @@ export default function Header() {
         </Link>
 
         {/* Link para o painel */}
-        {session?.user && (
+        {session?.user && pathname != "/dashboard" && (
           <Link href="/dashboard">
             <div className="bg-white px-3 py-1 rounded-lg font-semibold text-black hover:bg-gray-200 transition">
               MEU PAINEL
@@ -31,7 +33,9 @@ export default function Header() {
           <></>
         ) : session ? (
           <div className="flex items-center gap-4">
-            <span className="text-white">Olá, {session.user?.name}</span>
+            <span className="hidden md:inline text-white">
+              Olá, {session.user?.name}
+            </span>
             <button
               onClick={() => signOut()}
               className="bg-orange-500 px-4 py-2 rounded-lg text-white font-semibold hover:bg-orange-600 transition"
