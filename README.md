@@ -1,5 +1,7 @@
 # 🚀 Task Manager App
 
+![Home](public/screenshots/project.png)
+
 Aplicação web de gerenciamento de tarefas desenvolvida com **Next.js + React**, autenticação via **Google (NextAuth)** e armazenamento de dados no **Firebase (Firestore)**.
 
 ---
