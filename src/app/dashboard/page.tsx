@@ -3,14 +3,20 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
 import TextArea from "@/components/TextArea";
-import Head from "next/head";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 export default async function Dashboard() {
   const [inputDesc, setInputDesc] = useState("")
   const [inputTask, setInputTask] = useState("")
   const [checkedPubli, setCheckedPublic] = useState(false)
 
+  function handleRegisterTask(event: FormEvent) {
+    event.preventDefault()
+    if (inputTask === "" || inputDesc === "") {
+      alert("Preencha o nome e a descrição da Tarefa")
+    }
+
+  }
 
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -19,15 +25,12 @@ export default async function Dashboard() {
 
   return (
     <div className="max-w-[900px] mx-auto p-4 w-full flex flex-col items-center md:max-w-[900px]">
-      <Head>
-        <title>Meu painel de tarefas</title>
-      </Head>
       <header className="w-full mb-10 flex justify-center">
         <h1 className="text-white">Meu painel de tarefas</h1>
       </header>
       <section className="w-full flex flex-col gap-6">
         <h1 className="text-3xl text-white">Qual tarefa deseja inserir?</h1>
-        <form action="">
+        <form action="" onSubmit={handleRegisterTask}>
           <input
             type="text"
             placeholder="Digite sua tarefa aqui..."
