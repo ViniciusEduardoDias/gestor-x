@@ -2,14 +2,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
-
 import TextArea from "@/components/TextArea";
-
 import Head from "next/head";
+import { ChangeEvent, useState } from "react";
 
 export default async function Dashboard() {
-  const session = await getServerSession(authOptions);
+  const [inputDesc, setInputDesc] = useState("")
+  const [inputTask, setInputTask] = useState("")
+  const [checkedPubli, setCheckedPublic] = useState(false)
 
+
+  const session = await getServerSession(authOptions);
   if (!session?.user) {
     redirect("/");
   }
@@ -23,16 +26,27 @@ export default async function Dashboard() {
         <h1 className="text-white">Meu painel de tarefas</h1>
       </header>
       <section className="w-full flex flex-col gap-6">
-        <h1 className="text-3xl text-white">Qual sua tarefa?</h1>
+        <h1 className="text-3xl text-white">Qual tarefa deseja inserir?</h1>
         <form action="">
           <input
             type="text"
-            placeholder="Digite sua tarefa aqui"
+            placeholder="Digite sua tarefa aqui..."
             className="w-full px-4 py-2 mb-4"
+            value={inputTask}
+            onChange={(event) => { setInputTask(event.target.value) }}
           />
-          <TextArea placeholder="Descrição da sua tarefa aqui" />
+          <TextArea
+            placeholder="Descrição da sua tarefa aqui..."
+            value={inputDesc}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => { setInputDesc(event.target.value) }}
+          />
           <div className="flex gap-2 items-center justify-start text-white">
-            <input type="checkbox" className="rounded w-6 h-6" />
+            <input
+              type="checkbox"
+              className="rounded w-6 h-6"
+              checked={checkedPubli}
+              onChange={(event) => setCheckedPublic(event.target.checked)}
+            />
             <label>Deixar sua tarefa pública?</label>
           </div>
           <button
@@ -51,7 +65,7 @@ export default async function Dashboard() {
           <div className="w-100% p-4 rounded">
             <div className="flex gap-2">
               <h3 className="text-xl">Tarefa Exemplo</h3>
-              <span className="bg-blue-500 text-sm text-white rounded px-2 py-1">
+              <span className="bg-blue-500 text-sm text-white rounded px-2 py-1 hover:bg-blue-700">
                 Pública
               </span>
             </div>
