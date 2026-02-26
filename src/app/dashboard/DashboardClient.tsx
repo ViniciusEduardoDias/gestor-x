@@ -1,20 +1,59 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import TextArea from "@/components/TextArea";
 
 import { db } from "@/services/firebaseConnection";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, orderBy, where, onSnapshot } from "firebase/firestore";
 
 type Props = {
     userEmail: string;
 };
 
+interface TaskProps {
+    user: string,
+    id: string,
+    created: Date,
+    public: boolean,
+    tarefa: string,
+    desc: string
+}
+
 export default function DashboardClient({ userEmail }: Props) {
     const [inputDesc, setInputDesc] = useState("");
     const [inputTask, setInputTask] = useState("");
     const [checkedPubli, setCheckedPublic] = useState(false);
+    const [tasks, setTasks] = useState<TaskProps[]>([])
+
+    useEffect(() => {
+        async function loadTarefas() {
+            const tarefasRef = collection(db, "tarefas")
+            const q = query(
+                tarefasRef,
+                orderBy("createad", "desc"),
+                where("user", "==", userEmail)
+            )
+
+            onSnapshot(q, (snapshot) => {
+                let lista = [] as TaskProps[]
+                snapshot.forEach((doc) => {
+                    lista.push({
+                        id: doc.id,
+                        tarefa: doc.data().tarefa,
+                        created: doc.data().createad,
+                        user: doc.data().user,
+                        public: doc.data().public,
+                        desc: doc.data().desc
+                    })
+                })
+                setTasks(lista)
+                console.log(lista)
+            })
+        }
+        loadTarefas()
+    }, [userEmail])
+
 
     async function handleRegisterTask(event: FormEvent) {
         event.preventDefault();
@@ -28,7 +67,8 @@ export default function DashboardClient({ userEmail }: Props) {
                 tarefa: inputTask,
                 created: new Date(),
                 user: userEmail,
-                public: checkedPubli
+                public: checkedPubli,
+                desc: inputDesc
             })
             setInputTask("")
             setInputDesc("")

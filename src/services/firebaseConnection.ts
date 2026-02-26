@@ -15,5 +15,3 @@ const app = !getApps().length
     : getApp();
 
 export const db = getFirestore(app);
-
-
