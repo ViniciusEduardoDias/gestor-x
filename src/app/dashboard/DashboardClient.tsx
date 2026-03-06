@@ -6,7 +6,7 @@ import { FaShare } from "react-icons/fa";
 import TextArea from "@/components/TextArea";
 
 import { db } from "@/services/firebaseConnection";
-import { addDoc, collection, query, orderBy, where, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, query, orderBy, where, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 
 import Link from "next/link";
 
@@ -28,6 +28,7 @@ export default function DashboardClient({ userEmail }: Props) {
     const [inputTask, setInputTask] = useState("");
     const [checkedPubli, setCheckedPublic] = useState(false);
     const [tasks, setTasks] = useState<TaskProps[]>([])
+
 
     useEffect(() => {
         async function loadTarefas() {
@@ -57,6 +58,8 @@ export default function DashboardClient({ userEmail }: Props) {
     }, [userEmail])
 
 
+
+
     async function handleRegisterTask(event: FormEvent) {
         event.preventDefault();
 
@@ -78,6 +81,11 @@ export default function DashboardClient({ userEmail }: Props) {
         } catch (err) {
             console.error("Firebase error:", err);
         }
+    }
+
+    async function deleteRegisterTask(id: string) {
+        const docRef = doc(db, "tarefas", id)
+        await deleteDoc(docRef)
     }
 
     return (
@@ -123,7 +131,7 @@ export default function DashboardClient({ userEmail }: Props) {
             <section className="w-full bg-white px-10 py-10 rounded-md">
                 <h1 className="text-center text-3xl">Minhas tarefas</h1>
                 {tasks.map((item) => (
-                    <article className="flex justify-between mb-4 p-4 rounded-md border">
+                    <article key={item.id} className="flex justify-between mb-4 p-4 rounded-md border">
                         <div>
                             <h2 className="text-xl font-bold">{item.tarefa}</h2>
                             <p>{item.desc}</p>
@@ -135,7 +143,7 @@ export default function DashboardClient({ userEmail }: Props) {
                                 <button onClick={(event) => { }}>
                                     <FaShare className="text-blue-700" />
                                 </button>
-                                <FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} />
+                                <FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} onClick={() => { deleteRegisterTask(item.id) }} />
                             </div>
                         </div>
                     </article>
