@@ -57,9 +57,6 @@ export default function DashboardClient({ userEmail }: Props) {
         loadTarefas()
     }, [userEmail])
 
-
-
-
     async function handleRegisterTask(event: FormEvent) {
         event.preventDefault();
 
@@ -132,19 +129,27 @@ export default function DashboardClient({ userEmail }: Props) {
                 <h1 className="text-center text-3xl">Minhas tarefas</h1>
                 {tasks.map((item) => (
                     <article key={item.id} className="flex justify-between mb-4 p-4 rounded-md border">
+
                         <div>
-                            <h2 className="text-xl font-bold">{item.tarefa}</h2>
+                            {item.public ? (
+                                <Link href={`/task/${item.id}`}>
+                                    <h2 className="text-xl font-bold">{item.tarefa}</h2>
+                                </Link>
+                            ) : <h2 className="text-xl font-bold">{item.tarefa}</h2>
+                            }
                             <p>{item.desc}</p>
                         </div>
-                        <div className="flex flex-col gap-4 justify-around">
 
-                            <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white px-4 py-2 mr-2">PUBLICO</label>
-                            <div className="flex items-center justify-between mb-4">
-                                <button onClick={(event) => { }}>
-                                    <FaShare className="text-blue-700" />
-                                </button>
-                                <FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} onClick={() => { deleteRegisterTask(item.id) }} />
-                            </div>
+                        <div className="flex flex-col gap-4 items-end justify-center">
+                            {item.public && (
+                                <div className="flex gap-4 ">
+                                    <button onClick={(event) => { }}>
+                                        <FaShare className="text-blue-700" />
+                                    </button>
+                                    <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white px-4 py-2 mr-2">PUBLICO</label>
+                                </div>
+                            )}
+                            < FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} onClick={() => { deleteRegisterTask(item.id) }} />
                         </div>
                     </article>
                 )
