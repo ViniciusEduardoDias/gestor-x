@@ -85,6 +85,11 @@ export default function DashboardClient({ userEmail }: Props) {
         await deleteDoc(docRef)
     }
 
+    async function handleShare(id: string) {
+        await navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_URL}/task/${id}`)
+        alert("URL Copiada com sucesso!")
+    }
+
     return (
         <div className="max-w-[900px] mx-auto p-4 w-full flex flex-col items-center">
             <section className="w-full flex flex-col gap-6 my-10">
@@ -143,9 +148,7 @@ export default function DashboardClient({ userEmail }: Props) {
                         <div className="flex flex-col gap-4 items-end justify-center">
                             {item.public && (
                                 <div className="flex gap-4 ">
-                                    <button onClick={(event) => { }}>
-                                        <FaShare className="text-blue-700" />
-                                    </button>
+                                    <FaShare className="text-blue-700" onClick={() => { handleShare(item.id) }} />
                                     <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white px-4 py-2 mr-2">PUBLICO</label>
                                 </div>
                             )}
