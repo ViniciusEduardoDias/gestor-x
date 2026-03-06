@@ -2,10 +2,13 @@
 
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
+import { FaShare } from "react-icons/fa";
 import TextArea from "@/components/TextArea";
 
 import { db } from "@/services/firebaseConnection";
 import { addDoc, collection, query, orderBy, where, onSnapshot } from "firebase/firestore";
+
+import Link from "next/link";
 
 type Props = {
     userEmail: string;
@@ -31,7 +34,7 @@ export default function DashboardClient({ userEmail }: Props) {
             const tarefasRef = collection(db, "tarefas")
             const q = query(
                 tarefasRef,
-                orderBy("createad", "desc"),
+                orderBy("created", "desc"),
                 where("user", "==", userEmail)
             )
 
@@ -48,7 +51,6 @@ export default function DashboardClient({ userEmail }: Props) {
                     })
                 })
                 setTasks(lista)
-                console.log(lista)
             })
         }
         loadTarefas()
@@ -73,8 +75,6 @@ export default function DashboardClient({ userEmail }: Props) {
             setInputTask("")
             setInputDesc("")
             setCheckedPublic(false)
-            console.log("API KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
-
         } catch (err) {
             console.error("Firebase error:", err);
         }
@@ -122,23 +122,28 @@ export default function DashboardClient({ userEmail }: Props) {
 
             <section className="w-full bg-white px-10 py-10 rounded-md">
                 <h1 className="text-center text-3xl">Minhas tarefas</h1>
+                {tasks.map((item) => (
+                    <article className="flex justify-between mb-4 p-4 rounded-md border">
+                        <div>
+                            <h2 className="text-xl font-bold">{item.tarefa}</h2>
+                            <p>{item.desc}</p>
+                        </div>
+                        <div className="flex flex-col gap-4 justify-around">
 
-                <div className="w-100% p-4 rounded">
-                    <div className="flex gap-2">
-                        <h3 className="text-xl">Tarefa Exemplo</h3>
-                        <span className="bg-blue-500 text-sm text-white rounded px-2 py-1 hover:bg-blue-700">
-                            Pública
-                        </span>
-                    </div>
-                    <div className="flex justify-between">
-                        <p className="whitespace-pre-wrap">
-                            Descrição da tarefa exemplo.
-                        </p>
-                        <FaTrash className="mt-2 text-red-500 cursor-pointer hover:scale-105" />
-                    </div>
-                </div>
-                <hr></hr>
-            </section>
+                            <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white px-4 py-2 mr-2">PUBLICO</label>
+                            <div className="flex items-center justify-between mb-4">
+                                <button onClick={(event) => { }}>
+                                    <FaShare className="text-blue-700" />
+                                </button>
+                                <FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} />
+                            </div>
+                        </div>
+                    </article>
+                )
+                )}
+
+
+            </section >
 
         </div >
     );
