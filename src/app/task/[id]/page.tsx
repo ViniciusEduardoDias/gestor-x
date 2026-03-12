@@ -30,7 +30,8 @@ export default async function Page({ params }: { params: { id: string } }) {
         id: snapshot.id,
         tarefa: data.tarefa,
         desc: data.desc,
-        created: data.created.toDate(),
+        //        created: data.created.toDate(),
+        created: new Date(data.created.seconds * 1000),
         public: data.public
     }
 
