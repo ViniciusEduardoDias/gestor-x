@@ -17,21 +17,26 @@ export default function DetailsTask({ task }: Props) {
 
     return (
         <main className="py-16 flex h-[calc(100vh-190px)] flex-col items-center px-6 bg-gray-100">
-            <div className="relative w-full max-w-[900]">                <Link href="/">< IoMdArrowRoundBack className="absolute top-0 left-4 hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} /></Link>
+            <div className="relative w-full max-w-[900]">
+                <Link href="/">< IoMdArrowRoundBack className="absolute top-0 left-4 hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} /></Link>
             </div>
-            <span>Tarefa</span>
-            <article className="relative w-full max-w[900] border p-6 rounded">
-                <h1 className="text-2xl font-bold">
+            <span className="text-2xl font-bold">Tarefa</span>
+            <article className="relative w-full max-w[900] border my-10 px-6 py-10 rounded">
+                <h1 className="text-2xl font-bold text-orange-500">
                     {task.tarefa}
                 </h1>
-                <p className="mt-4">
+                <p className="mt-4 whitespace-pre-wrap">
                     {task.desc}
                 </p>
                 <span className="mt-2 md:absolute md:bottom-2 md:right-2 text-gray-400 text-sm">
                     {`Criada em ${task.created.toLocaleDateString()}`}
                 </span>
             </article>
-
-        </main >
+            <section className="flex flex-col gap-2 mt-4">
+                <h2 className="text-start">Quantidade de Comentários</h2>
+                <div className="flex">
+                </div>
+            </section>
+        </main>
     )
 }
