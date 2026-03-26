@@ -133,7 +133,16 @@ export default function DashboardClient({ userEmail }: Props) {
             <section className="w-full bg-white px-10 py-10 rounded-md">
                 <h1 className="text-center text-3xl">Minhas tarefas</h1>
                 {tasks.map((item) => (
-                    <article key={item.id} className="flex justify-between mb-4 p-4 rounded-md border">
+                    <article key={item.id} className="flex flex-col justify-between gap-4 mb-4 p-4 rounded-md border">
+                        <div className="flex gap-4 items-center justify-between">
+                            {item.public && (
+                                <div className="flex items-center gap-4 ">
+                                    <FaShare className="text-blue-700" onClick={() => { handleShare(item.id) }} />
+                                    <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white text-sm px-4 py-2 mr-2">PUBLICO</label>
+                                </div>
+                            )}
+                            < FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} onClick={() => { deleteRegisterTask(item.id) }} />
+                        </div>
 
                         <div>
                             {item.public ? (
@@ -143,16 +152,6 @@ export default function DashboardClient({ userEmail }: Props) {
                             ) : <h2 className="text-xl font-bold">{item.tarefa}</h2>
                             }
                             <p>{item.desc}</p>
-                        </div>
-
-                        <div className="flex flex-col gap-4 items-end justify-center">
-                            {item.public && (
-                                <div className="flex gap-4 ">
-                                    <FaShare className="text-blue-700" onClick={() => { handleShare(item.id) }} />
-                                    <label className="bg-blue-500 hoverbg-blue-700 rounded-md text-white px-4 py-2 mr-2">PUBLICO</label>
-                                </div>
-                            )}
-                            < FaTrash className="hover:scale-110 hover:text-red-700 transition-all duration-150" size={18} onClick={() => { deleteRegisterTask(item.id) }} />
                         </div>
                     </article>
                 )
