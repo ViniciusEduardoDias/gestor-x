@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useSession } from "next-auth/react";
 import { doc, collection, query, where, addDoc } from "firebase/firestore"
 import { db } from "@/services/firebaseConnection";
+import Toast from "@/components/Toast";
 
 
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -22,6 +23,8 @@ type Props = {
 
 export default function DetailsTask({ task }: Props) {
     const { data: session } = useSession()
+    const [showToast, setShowToast] = useState(false)
+    const [toastMessage, setToastMessage] = useState("")
 
     const [input, setInput] = useState("")
 
@@ -39,6 +42,8 @@ export default function DetailsTask({ task }: Props) {
                 taskId: task?.id
             })
             setInput("")
+            setToastMessage("Comentário adicionado com sucesso!")
+            setShowToast(true)
 
         } catch (error) {
             console.log(error)
@@ -81,6 +86,11 @@ export default function DetailsTask({ task }: Props) {
                     <p className="text-sm">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
                 </article>
             </main>
+            <Toast
+                message={toastMessage}
+                show={showToast}
+                onClose={() => setShowToast(false)}
+            />
         </main>
     )
 }
