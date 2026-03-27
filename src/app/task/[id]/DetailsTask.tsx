@@ -1,8 +1,9 @@
 "use client"
 import Link from "next/link"
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useSession } from "next-auth/react";
-
+import { doc, collection, query, where, addDoc } from "firebase/firestore"
+import { db } from "@/services/firebaseConnection";
 
 
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -21,6 +22,29 @@ type Props = {
 
 export default function DetailsTask({ task }: Props) {
     const { data: session } = useSession()
+
+    const [input, setInput] = useState("")
+
+    async function handleRegisterComent(event: FormEvent) {
+        event.preventDefault()
+        if (input === "" || !session?.user || !session?.user?.name) {
+            return
+        }
+        try {
+            const docRef = await addDoc(collection(db, "coments"), {
+                comment: input,
+                created: new Date(),
+                user: session?.user?.email,
+                name: session?.user?.name,
+                taskId: task?.id
+            })
+            setInput("")
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <main className="py-16 flex min-h-[calc(100vh-190px)] flex-col items-center px-6 bg-gray-100">
             <div className="relative w-full max-w-[900px]">
@@ -40,8 +64,12 @@ export default function DetailsTask({ task }: Props) {
             </article>
             <main className="py-16 flex min-h-[calc(100vh-190px)] flex-col items-center bg-gray-100 gap-4">
                 <h2 className="text-start font-bold text-2xl">Quantidade de Comentários</h2>
-                <form className="w-full">
-                    <TextArea placeholder="Digite aqui seu comentário..." />
+                <form onSubmit={handleRegisterComent} className="w-full">
+                    <TextArea
+                        placeholder="Digite aqui seu comentário..."
+                        value={input}
+                        onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setInput(event.target.value)}
+                    />
                     <button type="submit" disabled={!session?.user} className="w-full px-4 py-2 bg-sky-600 hover:bg-sky-800 font-bold text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed">Enviar Comentário</button>
                 </form>
 
