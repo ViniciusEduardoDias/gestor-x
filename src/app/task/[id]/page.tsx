@@ -11,9 +11,11 @@ type Task = {
     public: boolean
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: any) {
 
-    const docRef = doc(db, "tarefas", params.id)
+    const { id } = await params
+
+    const docRef = doc(db, "tarefas", id)
     const snapshot = await getDoc(docRef)
 
     if (!snapshot.exists()) {
@@ -30,7 +32,6 @@ export default async function Page({ params }: { params: { id: string } }) {
         id: snapshot.id,
         tarefa: data.tarefa,
         desc: data.desc,
-        //        created: data.created.toDate(),
         created: new Date(data.created.seconds * 1000),
         public: data.public
     }

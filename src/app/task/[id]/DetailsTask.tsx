@@ -1,14 +1,17 @@
 "use client"
 import Link from "next/link"
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { doc, collection, query, where, addDoc } from "firebase/firestore"
+import { doc, collection, query, where, addDoc, onSnapshot, orderBy } from "firebase/firestore"
 import { db } from "@/services/firebaseConnection";
 import Toast from "@/components/Toast";
+import Image from "next/image";
 
+import TextArea from "@/components/TextArea";
 
 import { IoMdArrowRoundBack } from "react-icons/io";
-import TextArea from "@/components/TextArea";
+
+
 type Task = {
     id: string
     tarefa: string
@@ -21,13 +24,51 @@ type Props = {
     task: Task
 }
 
+type Comment = {
+    id: string
+    comment: string
+    name: string
+    created: Date
+    taskId: string
+    image?: string
+}
+
 export default function DetailsTask({ task }: Props) {
     const { data: session } = useSession()
     const [showToast, setShowToast] = useState(false)
     const [toastMessage, setToastMessage] = useState("")
+    const [comments, setComments] = useState<Comment[]>([])
 
     const [input, setInput] = useState("")
 
+    useEffect(() => {
+
+        const q = query(
+            collection(db, "coments"),
+            where("taskId", "==", task.id),
+            orderBy("created", "desc")
+        )
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+
+            let list = [] as Comment[]
+
+            snapshot.forEach((doc) => {
+                list.push({
+                    id: doc.id,
+                    comment: doc.data().comment,
+                    name: doc.data().name,
+                    taskId: doc.data().taskId,
+                    created: new Date(doc.data().created.seconds * 1000)
+                })
+            })
+
+            setComments(list)
+        })
+
+
+        return () => unsubscribe()
+
+    }, [task.id])
     async function handleRegisterComent(event: FormEvent) {
         event.preventDefault()
         if (input === "" || !session?.user || !session?.user?.name) {
@@ -39,7 +80,8 @@ export default function DetailsTask({ task }: Props) {
                 created: new Date(),
                 user: session?.user?.email,
                 name: session?.user?.name,
-                taskId: task?.id
+                taskId: task?.id,
+                image: session?.user?.image,
             })
             setInput("")
             setToastMessage("Comentário adicionado com sucesso!")
@@ -67,8 +109,8 @@ export default function DetailsTask({ task }: Props) {
                     {`Criada em ${task.created.toLocaleDateString()}`}
                 </span>
             </article>
-            <main className="py-16 flex min-h-[calc(100vh-190px)] flex-col items-center bg-gray-100 gap-4">
-                <h2 className="text-start font-bold text-2xl">Quantidade de Comentários</h2>
+            <section id="Comments" className="w-full max-w-[1200px] py-16 flex min-h-[calc(100vh-190px)] flex-col items-center bg-gray-100">
+                <h2 className="text-start font-bold text-2xl mb-4">{comments.length} comentários</h2>
                 <form onSubmit={handleRegisterComent} className="w-full">
                     <TextArea
                         placeholder="Digite aqui seu comentário..."
@@ -78,19 +120,39 @@ export default function DetailsTask({ task }: Props) {
                     <button type="submit" disabled={!session?.user} className="w-full px-4 py-2 bg-sky-600 hover:bg-sky-800 font-bold text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed">Enviar Comentário</button>
                 </form>
 
-                <article className="relative w-full border my-10 px-6 py-10 rounded">
-                    <div className="flex gap-2 items-center">
-                        <span className="font-bold">Nome de quem comentou</span>
-                        <span className="text-sm opacity-50">há tanto tempo</span>
-                    </div>
-                    <p className="text-sm">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-                </article>
-            </main>
+                {comments.map((coment) => (
+                    <article key={coment.id} className="relative w-full border my-2 px-6 py-10">
+                        <div className="flex gap-6">
+                            <Image
+                                src={coment.image || "/avatar.png"}
+                                alt={coment.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                            />
+                            <div className="flex flex-col gap-2">
+                                <div className="flex gap-2 items-center">
+                                    <span className="font-bold">{coment.name}</span>
+                                    <span className="absolute right-2 bottom-2 text-sm opacity-50">
+                                        {coment.created.toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <p className="text-sm">
+                                    {coment.comment}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                ))}
+
+
+            </section>
+
             <Toast
                 message={toastMessage}
                 show={showToast}
                 onClose={() => setShowToast(false)}
             />
-        </main>
+        </main >
     )
 }
