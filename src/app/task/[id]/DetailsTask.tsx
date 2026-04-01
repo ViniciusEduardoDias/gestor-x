@@ -124,7 +124,7 @@ export default function DetailsTask({ task }: Props) {
                 </span>
             </article>
             <section id="Comments" className="w-full max-w-[1200px] py-16 flex min-h-[calc(100vh-190px)] flex-col items-center bg-gray-100">
-                <h2 className="text-start font-bold text-2xl mb-4">{comments.length} comentários</h2>
+                <h2 className="text-start font-bold text-2xl mb-4">{comments.length} {comments.length > 1 ? `comentários` : 'comentário'}</h2>
                 <form onSubmit={handleRegisterComent} className="w-full">
                     <TextArea
                         placeholder="Digite aqui seu comentário..."
