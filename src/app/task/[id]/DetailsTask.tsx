@@ -2,14 +2,14 @@
 import Link from "next/link"
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { doc, collection, query, where, addDoc, onSnapshot, orderBy } from "firebase/firestore"
+import { doc, collection, query, where, addDoc, onSnapshot, orderBy, deleteDoc } from "firebase/firestore"
 import { db } from "@/services/firebaseConnection";
 import Toast from "@/components/Toast";
 import Image from "next/image";
 
 import TextArea from "@/components/TextArea";
 
-import { IoMdArrowRoundBack } from "react-icons/io";
+import { IoMdArrowRoundBack, IoMdTrash } from "react-icons/io";
 
 
 type Task = {
@@ -28,6 +28,7 @@ type Comment = {
     id: string
     comment: string
     name: string
+    user: string
     created: Date
     taskId: string
     image?: string
@@ -58,6 +59,7 @@ export default function DetailsTask({ task }: Props) {
                     comment: doc.data().comment,
                     name: doc.data().name,
                     taskId: doc.data().taskId,
+                    user: doc.data().user,
                     created: new Date(doc.data().created.seconds * 1000)
                 })
             })
@@ -85,6 +87,18 @@ export default function DetailsTask({ task }: Props) {
             })
             setInput("")
             setToastMessage("Comentário adicionado com sucesso!")
+            setShowToast(true)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function deleteComent(id: string) {
+        try {
+            await deleteDoc(doc(db, "coments", id))
+
+            setToastMessage("Comentário removido com sucesso!")
             setShowToast(true)
 
         } catch (error) {
@@ -142,12 +156,15 @@ export default function DetailsTask({ task }: Props) {
                                 </p>
                             </div>
                         </div>
+                        {session?.user?.email === coment.user && (
+                            <IoMdTrash
+                                size={20}
+                                className="absolute right-2 top-2 text-gray-700 hover:text-orange-700 cursor-pointer"
+                                onClick={() => deleteComent(coment.id)} />
+                        )}
                     </article>
                 ))}
-
-
             </section>
-
             <Toast
                 message={toastMessage}
                 show={showToast}
